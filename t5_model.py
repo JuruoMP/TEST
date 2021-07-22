@@ -81,7 +81,7 @@ class SQLT5(pl.LightningModule):
             pred_list = sorted(pred_dict.items(), key=lambda x: x[0])
             with open('bart/predict/predict.txt', 'w') as fw:
                 for idx, (pred, db_name) in pred_list:
-                    fw.write(pred + '\n')
+                    fw.write(str(idx) + '\t' + pred + '\n')
 
     def configure_optimizers(self):
         optimizer = torch.optim.AdamW(self.parameters(), lr=self.learning_rate)

@@ -299,7 +299,8 @@ class WikisqlDataset(torch.utils.data.Dataset):
         src_mask = source["attention_mask"].squeeze()
         target_mask = targets["attention_mask"].squeeze()
 
-        return {"source_ids": source_ids, "source_mask": src_mask, "target_ids": target_ids, "target_mask": target_mask}
+        return {"input_ids": source_ids, "attention_mask": src_mask,
+                "decoder_input_ids": target_ids, "decoder_attention_mask": target_mask}
 
 
 class SpiderDataModule(pl.LightningDataModule):
