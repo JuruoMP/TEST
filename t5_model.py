@@ -11,7 +11,7 @@ class SQLT5(pl.LightningModule):
         self.tokenizer = tokenizer
         self.model = T5ForConditionalGeneration.from_pretrained(tokenizer.name_or_path)
         self.loss_fct = torch.nn.CrossEntropyLoss(ignore_index=-100)
-        self.learning_rate = 1e-5
+        self.learning_rate = 3e-4
         self.check_interval = 3
 
     @staticmethod
@@ -47,12 +47,13 @@ class SQLT5(pl.LightningModule):
         ).loss
 
         pred_lfs = []
-        pred_ids = self.model.generate(x['input_ids'], num_beams=4, max_length=512, early_stopping=True, no_repeat_ngram_size=0)[:, 1:]
+        pred_ids = self.model.generate(x['input_ids'], num_beams=4, max_length=512, early_stopping=True, no_repeat_ngram_size=0)
         for i in range(x['id'].size(0)):
-            pred_lf = self.tokenizer.convert_ids_to_tokens(pred_ids[i])
-            if self.tokenizer.eos_token in pred_lf:
-                pred_lf = pred_lf[:pred_lf.index(self.tokenizer.eos_token)]
-            pred_lf = ''.join(pred_lf).replace('Ġ', ' ')
+            # pred_lf = self.tokenizer.convert_ids_to_tokens(pred_ids[i])
+            # if self.tokenizer.eos_token in pred_lf:
+            #     pred_lf = pred_lf[:pred_lf.index(self.tokenizer.eos_token)]
+            # pred_lf = ''.join(pred_lf).replace('Ġ', ' ')
+            pred_lf = self.tokenizer.decode(pred_ids)
             db_name = ''.join(self.tokenizer.convert_ids_to_tokens(x['db_name'][i])).replace('Ġ', ' ')
             pred_lfs.append((x['id'][i].item(), pred_lf, db_name))
         self.log('val_loss', masked_lm_loss, sync_dist=True, prog_bar=True)
