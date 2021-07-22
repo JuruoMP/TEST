@@ -47,7 +47,8 @@ class SQLT5(pl.LightningModule):
         ).loss
 
         pred_lfs = []
-        pred_ids = self.model.generate(x['input_ids'], num_beams=4, max_length=512, early_stopping=True, no_repeat_ngram_size=0)
+        pred_ids = self.model.generate(input_ids=x['input_ids'], attention_mask=x['attention_mask'],
+                                       num_beams=4, max_length=512, early_stopping=True, no_repeat_ngram_size=0)
         for i in range(x['id'].size(0)):
             # pred_lf = self.tokenizer.convert_ids_to_tokens(pred_ids[i])
             # if self.tokenizer.eos_token in pred_lf:
