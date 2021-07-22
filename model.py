@@ -22,7 +22,7 @@ class SQLBart(pl.LightningModule):
         self.loss_fct = torch.nn.CrossEntropyLoss(ignore_index=-100)
         self.learning_rate = 2e-5
         self.check_interval = 1
-        self.generate_interval = 10
+        self.generate_interval = 3
 
     @staticmethod
     def shift_tokens_right(input_ids: torch.Tensor, pad_token_id: int, decoder_start_token_id: int):

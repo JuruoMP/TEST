@@ -12,7 +12,7 @@ class SQLT5(pl.LightningModule):
         self.model = T5ForConditionalGeneration.from_pretrained(tokenizer.name_or_path)
         self.loss_fct = torch.nn.CrossEntropyLoss(ignore_index=-100)
         self.learning_rate = 1e-5
-        self.check_interval = 1
+        self.check_interval = 3
 
     @staticmethod
     def shift_tokens_right(input_ids: torch.Tensor, pad_token_id: int, decoder_start_token_id: int):
@@ -25,15 +25,17 @@ class SQLT5(pl.LightningModule):
         return shifted_input_ids
 
     def training_step(self, x, batch_idx):
-        masked_lm_loss = self.model(
-            input_ids=x['input_ids'],
-            attention_mask=x['attention_mask'],
-            decoder_input_ids=self.shift_tokens_right(x['decoder_input_ids'], self.tokenizer.pad_token_id, self.tokenizer.eos_token_id),
-            decoder_attention_mask=x['decoder_attention_mask'],
-            labels=x['labels']
+        x_spider, x_wikisql = x['spider'], x['wikisql']
+        masked_lm_loss_spider = self.model(
+            input_ids=x_spider['input_ids'],
+            attention_mask=x_spider['attention_mask'],
+            decoder_input_ids=self.shift_tokens_right(x_spider['decoder_input_ids'], self.tokenizer.pad_token_id,
+                                                      self.tokenizer.eos_token_id),
+            decoder_attention_mask=x_spider['decoder_attention_mask'],
+            labels=x_spider['labels']
         ).loss
-        self.log('train_loss', masked_lm_loss, sync_dist=True)
-        return masked_lm_loss
+        self.log('train_loss', masked_lm_loss_spider, sync_dist=True)
+        return masked_lm_loss_spider
 
     def validation_step(self, x, batch_idx):
         masked_lm_loss = self.model(
@@ -76,10 +78,10 @@ class SQLT5(pl.LightningModule):
                     for line in lines:
                         idx, pred_lf, db_name = line.strip().split('\t')
                         pred_dict[int(idx)] = (pred_lf, db_name)
-                    with open(f'bart/predict/predict_rank_{i}.txt', 'w') as fw:
+                    with open(f't5/predict/predict_rank_{i}.txt', 'w') as fw:
                         pass
             pred_list = sorted(pred_dict.items(), key=lambda x: x[0])
-            with open('bart/predict/predict.txt', 'w') as fw:
+            with open('t5/predict/predict.txt', 'w') as fw:
                 for idx, (pred, db_name) in pred_list:
                     fw.write(str(idx) + '\t' + pred + '\n')
 
