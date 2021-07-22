@@ -50,9 +50,9 @@ class SQLBart(pl.LightningModule):
             decoder_attention_mask=x_wikisql['decoder_attention_mask'],
             labels=x_wikisql['labels']
         ).loss
-        self.log('train_loss_spider', masked_lm_loss_spider, sync_dist=True)
-        self.log('train_loss_wikisql', masked_lm_loss_wikisql, sync_dist=True)
-        self.log('train_loss', masked_lm_loss_spider + masked_lm_loss_wikisql, sync_dist=True)
+        self.log('train_loss_spider', masked_lm_loss_spider, sync_dist=True, prog_bar=True)
+        self.log('train_loss_wikisql', masked_lm_loss_wikisql, sync_dist=True, prog_bar=True)
+        self.log('train_loss', masked_lm_loss_spider + masked_lm_loss_wikisql, sync_dist=True, prog_bar=True)
         return masked_lm_loss_spider + masked_lm_loss_wikisql
 
     def validation_step(self, x, batch_idx):

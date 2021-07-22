@@ -300,7 +300,8 @@ class WikisqlDataset(torch.utils.data.Dataset):
         target_mask = targets["attention_mask"].squeeze()
 
         return {"input_ids": source_ids, "attention_mask": src_mask,
-                "decoder_input_ids": target_ids, "decoder_attention_mask": target_mask}
+                "decoder_input_ids": target_ids, "decoder_attention_mask": target_mask,
+                "labels": target_ids.masked_fill(1 - target_mask, -100)}
 
 
 class SpiderDataModule(pl.LightningDataModule):
@@ -346,7 +347,10 @@ class SpiderDataModule(pl.LightningDataModule):
 
 
 if __name__ == '__main__':
-    wikisql = WikisqlDataset()
+    wikisql_dataset = WikisqlDataset('train', input_length=512, output_length=150)
+    loader = DataLoader(wikisql_dataset, batch_size=8)
+    for batch in loader:
+        a = 1
     bart_tokenizer = BartTokenizer.from_pretrained('facebook/bart-base')
     # train_data = SpiderDataset('Spider/train.json', 'Spider/tables.json', 'Spider/database', bart_tokenizer)
     # dataloader = torch.utils.data.DataLoader(train_data, batch_size=7, collate_fn=train_data.collate_fn)

@@ -15,10 +15,10 @@ if __name__ == '__main__':
     t5_tokenizer = T5Tokenizer.from_pretrained(config_name)
     sql_t5 = SQLT5(t5_tokenizer)
 
-    sparc_data = SpiderDataModule('spider/', batch_size=8, tokenizer=t5_tokenizer)
+    sparc_data = SpiderDataModule('spider/', batch_size=16, tokenizer=t5_tokenizer)
     trainer = pl.Trainer(gpus=-1, precision=16, default_root_dir='checkpoints',
                          terminate_on_nan=True, accumulate_grad_batches=1,
-                         gradient_clip_val=5, gradient_clip_algorithm='value',
+                         gradient_clip_val=5,
                          callbacks=[EarlyStopping(monitor='val_loss', patience=10, mode='min')],
                          )
     # trainer = pl.Trainer(default_root_dir='checkpoints',
