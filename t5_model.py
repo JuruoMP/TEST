@@ -54,7 +54,7 @@ class SQLT5(pl.LightningModule):
             # if self.tokenizer.eos_token in pred_lf:
             #     pred_lf = pred_lf[:pred_lf.index(self.tokenizer.eos_token)]
             # pred_lf = ''.join(pred_lf).replace('Ġ', ' ')
-            pred_lf = self.tokenizer.decode(pred_ids)
+            pred_lf = self.tokenizer.decode(pred_ids[i])
             db_name = ''.join(self.tokenizer.convert_ids_to_tokens(x['db_name'][i])).replace('Ġ', ' ')
             pred_lfs.append((x['id'][i].item(), pred_lf, db_name))
         self.log('val_loss', masked_lm_loss, sync_dist=True, prog_bar=True)
